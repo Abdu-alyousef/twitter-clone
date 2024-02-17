@@ -31,6 +31,6 @@ export default async function handler(
     return res.status(200).json({...exisistingUser, followersCount})
   } catch (error) {
     console.log(error);
-    return res.status(400).end;
+    res.status(400).end;
   }
 }

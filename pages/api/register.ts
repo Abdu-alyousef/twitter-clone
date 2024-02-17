@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { compare, hash } from "bcryptjs";
+import {  hash } from "bcryptjs";
 
 import prisma from '@/libs/prismadb'
 

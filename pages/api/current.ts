@@ -6,9 +6,10 @@ export default async function handler(
   res: NextApiResponse
 ) {
   try {
-    const { currentUser } = await serverAuth(req);
+    const currentUser = await serverAuth(req);
     res.status(200).json(currentUser);
   } catch (error) {
-    res.status(401).json({ message: "Not authenticated" });
+    console.error("Error:", error);
+    res.status(401).json({ message: "Not authenticated!" });
   }
 }
