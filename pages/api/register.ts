@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import {  hash } from "bcryptjs";
 
 import prisma from '@/libs/prismadb'
+import { json } from "stream/consumers";
 
 
 export default async function handler(

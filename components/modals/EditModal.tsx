@@ -80,7 +80,7 @@ const EditModal = () => {
         disabled={isLoading}
         />
         <ImageUpload onChange={(image) => setProfileImage(image)} disabled={isLoading} label="Upload profile image" value={profileImage} />
-        <ImageUpload onChange={(image) => setCoverImage(image)} disabled={isLoading} label="Upload profile image" value={coverImage} />
+        <ImageUpload onChange={(image) => setCoverImage(image)} disabled={isLoading} label="Upload Cover image" value={coverImage} />
 
     </div>
   )
