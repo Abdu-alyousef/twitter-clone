@@ -4,16 +4,19 @@ import { formatDistanceToNowStrict } from "date-fns";
 import { useRouter } from "next/router";
 import { useCallback, useMemo } from "react";
 import Avatar from "../Avatar";
-import { AiOutlineHeart, AiOutlineMessage } from "react-icons/ai";
+import { AiFillHeart, AiOutlineHeart, AiOutlineMessage } from "react-icons/ai";
+import useLike from "@/hooks/useLike";
 
 interface PostItemProps {
   data: Record<string, any>;
   userId?: string;
 }
-const PostItem: React.FC<PostItemProps> = ({ userId, data }) => {
-  const { data: currentUser } = useCurrentUser();
+const PostItem: React.FC<PostItemProps> = ({data, userId }) => {
   const router = useRouter();
   const loginModal = useLoginModal();
+
+  const { data: currentUser } = useCurrentUser();
+  const {hasLiked, toggleLike} = useLike({postId: data.id, userId})
 
   const goToUser = useCallback(
     (event: any) => {
@@ -30,9 +33,12 @@ const PostItem: React.FC<PostItemProps> = ({ userId, data }) => {
     (event: any) => {
       event.stopPropagation();
 
-      loginModal.onOpen();
+      if (!currentUser) {
+        return loginModal.onOpen();
+      }
+      toggleLike();
     },
-    [loginModal]
+    [loginModal, toggleLike, currentUser]
   );
 
   const createdAt = useMemo(() => {
@@ -41,6 +47,8 @@ const PostItem: React.FC<PostItemProps> = ({ userId, data }) => {
     }
     return formatDistanceToNowStrict(new Date(data.createdAt));
   }, [data?.createdAt]);
+
+  const LikedIcon = hasLiked ? AiFillHeart : AiOutlineHeart;
   return (
     <div onClick={goToPost}
     className="border-b-[1px] border-neutral-800 p-5 cursor-pointer hover:bg-neutral-900 transition">
@@ -77,8 +85,8 @@ const PostItem: React.FC<PostItemProps> = ({ userId, data }) => {
                 transition
                 hover:text-red-500
                 ">
-                    <AiOutlineHeart size={20}/>
-                    <p>{data.commet?.length || 0}</p>
+                   <LikedIcon size={20} color={hasLiked ? 'red' : ''} />
+                     <p>{data.likedIds?.length || 0}</p> 
                 </div>
             </div>
         </div>

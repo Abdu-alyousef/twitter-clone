@@ -1,6 +1,5 @@
-import { NextApiRequest, NextApiResponse } from "next";
-
 import serverAuth from "@/libs/serverAuth";
+import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "@/libs/prismadb";
 
 export default async function handler(
@@ -10,42 +9,43 @@ export default async function handler(
   if (req.method !== "POST" && req.method !== "DELETE") {
     return res.status(405).end();
   }
-
   try {
-    const { userId } = req.body;
+    const { postId } = req.body;
     const { currentUser } = await serverAuth(req, res);
-    if (!userId || typeof userId !== "string") {
+
+    if (!postId || typeof postId !== "string") {
       throw new Error("Invalid ID");
     }
-    const user = await prisma.user.findUnique({
+
+    const post = await prisma.post.findUnique({
       where: {
-        id: userId,
+        id: postId,
       },
     });
 
-    if (!user) {
+    if (!post) {
       throw new Error("Invalid ID");
     }
-    let updatedFollowingIds = [...(user.followingIds || [])];
+
+    let updatedLikedIds = [...(post.likedIds || [])];
     if (req.method === "POST") {
-      updatedFollowingIds.push(userId);
+      updatedLikedIds.push(currentUser.id);
     }
     if (req.method === "DELETE") {
-      updatedFollowingIds = updatedFollowingIds.filter(
-        (followingId) => followingId !== userId
+      updatedLikedIds = updatedLikedIds.filter(
+        (likedId) => likedId !== currentUser.id
       );
     }
 
-    const updatedUser = await prisma.user.update({
+    const updatedPost = await prisma.post.update({
       where: {
-        id: currentUser.id,
+        id: postId,
       },
       data: {
-        followingIds: updatedFollowingIds,
+        likedIds: updatedLikedIds,
       },
     });
-
-    return res.status(200).json(updatedUser);
+    return res.status(200).json(updatedPost);
   } catch (error) {
     console.log(error);
     return res.status(400).end();
